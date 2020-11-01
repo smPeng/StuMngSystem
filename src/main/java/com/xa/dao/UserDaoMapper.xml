@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xa.dao.UserDaoMapper">
+	<!-- 根据账号，获取用户信息，包括用户角色 -->
+	<select id="getUserInfo" resultMap="userMap">
+		SELECT u.id,u.account,u.pwd,ur.rid,r.rname,r.rdesc,pr.pid,p.pname
+		FROM users AS u
+		LEFT JOIN user_role AS ur
+		ON u.id=ur.id
+		LEFT JOIN roles AS r
+		ON r.rid=ur.id
+		left join prmssns_roles AS pr
+		on r.rid=pr.rid
+		Left join permission AS p
+		on pr.pid=p.pid
+		WHERE u.account = #{account}
+	</select>
+	<!-- 将getUserInfo结果集映射成一个用户对象 -->
+	<resultMap id="userMap" type="com.xa.entity.User">
+		<id property="id" column="id" />
+		<result property="account" column="account" />
+		<result property="pwd" column="pwd" />
+		<collection property="rolList" ofType="com.xa.entity.Roles">
+			<id property="rId" column="rid" />
+			<result property="rName" column="rname" />
+			<result property="rDesc" column="rdesc" />
+		</collection>
+		<collection property="prmList" ofType="com.xa.entity.Permission">
+			<id property="pid" column="pid" />
+			<result property="pname" column="pname" />
+			<result property="pdesc" column="pdesc" />
+		</collection>
+	</resultMap>
+</mapper>

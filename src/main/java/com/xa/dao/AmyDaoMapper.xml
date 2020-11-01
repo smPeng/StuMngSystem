@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xa.dao.AmyDaoMapper">
+	<cache
+  eviction="FIFO"
+  flushInterval="60000"
+  size="512"
+  readOnly="true"/>
+	<!-- 定义共同的sql语句 -->
+	<sql id="commsql">SELECT did,dname,ddesc FROM academy </sql>
+	<!-- 插入部门信息 -->
+	<insert id="saveAmyInfo">
+		insert into academy(dname,ddesc) values(#{dname},#{ddesc})
+	</insert>
+	<!-- 删除部门信息 -->
+	<delete id="delAmyInfo">
+		delete from academy where did=#{did}
+	</delete>
+	<!-- 修改部门信息 -->
+	<update id="modifyAmyInfo">
+		update academy set dname=#{dname},ddesc=#{ddesc} where did=#{did}
+	</update>
+	<!-- 根据部门编号查找部门信息 -->
+	<select id="findAmyInfo" resultType="com.xa.entity.Academy">
+		<include refid="commsql"></include>
+		WHERE did=#{did}
+	</select>
+	<!-- 获取当前页的部门信息 -->
+	<select id="findAmyInfoWithPage" resultType="com.xa.entity.Academy">
+		<include refid="commsql"></include>
+		<where>
+			<!-- <if test="dname!=null"> dname LIKE '%${dname}%' 
+				</if> -->
+			<choose>
+				<when test="dname!=null">
+					dname LIKE '%${dname}%'
+				</when>
+			</choose>
+		</where>
+		limit #{offset},#{pageSize}
+	</select>
+	<select id="findAllAmyInfo" resultType="com.xa.entity.Academy">
+		<include refid="commsql"></include>
+	</select>
+	<!-- 获取本次查询的部门个数 -->
+	<select id="getAmyCount" resultType="int">
+			SELECT COUNT(*)  FROM academy
+			<where>
+			<!-- <if test="dname!=null"> dname LIKE '%${dname}%' 
+				</if> -->
+			<choose>
+				<when test="dname!=null">
+					dname LIKE '%${dname}%'
+				</when>
+			</choose>
+		</where>
+	</select>
+</mapper>

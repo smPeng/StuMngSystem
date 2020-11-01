@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xa.dao.StuDaoMapper">
+	<cache
+  eviction="FIFO"
+  flushInterval="60000"
+  size="512"
+  readOnly="true"/>
+	<!-- 定义共同的sql语句 -->
+	<sql id="commsql">SELECT stus.eId,stus.eName,academy.did,academy.dname FROM stus LEFT JOIN academy ON stus.did=academy.did</sql>
+	<!-- 获取本次查询的员工数 -->
+	<!-- 插入员工信息 -->
+	<insert id="saveStuInfo">
+		insert into stus(eName,did) values (#{eName},#{did})
+	</insert>
+	<!-- 删除员工信息 -->
+	<delete id="batchStuInfo">
+		delete from stus where eId =#{eId}
+	</delete>
+	<!-- 修改员工信息 -->
+	<update id="modifyStuInfo">
+		update stus set eName=#{eName},did=#{did} where eId=#{eId}
+	</update>
+	<!-- 查找所有的员工信息 -->
+	<select id="findAllStuInfo" resultType="com.xa.entity.Stu">
+		<include refid="commsql"></include>
+	</select>
+	<!-- 获取当前页的员工信息 -->
+	<select id="findAllStuInfoWithPage" resultType="com.xa.entity.Stu">
+		<include refid="commsql"></include>
+		<where>
+			<choose>
+				<when test="eName!=null">
+					AND stus.eName LIKE '%${eName}%'
+				</when>
+			</choose>
+			<choose>
+				<when test="did!=null">
+					AND stus.did=#{did}
+				</when>
+			</choose>
+		</where>
+		limit #{offset},#{pageSize}
+	</select>
+	<!-- 获取本次查询的部门个数 -->
+	<select id="getStuCount" resultType="int">
+			SELECT count(*) FROM stus LEFT JOIN academy ON stus.did=academy.did
+		<where>
+			<choose>
+				<when test="eName!=null">
+					AND stus.eName LIKE '%${eName}%'
+				</when>
+			</choose>
+			<choose>
+				<when test="did!=null">
+					AND stus.did=#{did}
+				</when>
+			</choose>
+		</where>
+	</select>
+</mapper>
